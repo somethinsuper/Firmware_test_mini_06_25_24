@@ -1,0 +1,7 @@
+{
+    "configuration": "cpu=atmega328old",
+    "board": "arduino:avr:nano",
+    "sketch": "Firmware_test_mini_06_25_24.ino",
+    "programmer": "arduinoisp",
+    "port": "/dev/tty.usbserial-1440"
+}
