@@ -5,37 +5,39 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
 from kivy.uix.spinner import Spinner
 from kivy.clock import Clock
+from kivy.uix.widget import Widget
 from kivy_garden.matplotlib import FigureCanvasKivyAgg
+from kivy.uix.boxlayout import BoxLayout
 import matplotlib.pyplot as plt
 import numpy as np
 import serial
 import serial.tools.list_ports
 import threading
 class SerialMonitor(BoxLayout):
-    def __init__(self, application_gui, **kwargs):
+    def __init__(self, application_gui, hint: float, **kwargs):
         super(SerialMonitor, self).__init__(**kwargs)
         self.orientation = 'vertical'
-        self.size_hint_y = None
-        self.height = 160  # Adjust height based on the number of form fields
+        topLayout = BoxLayout(size_hint_y=hint / 4, size_hint_x=1)
+        topLayout.orientation = 'horizontal'
+        self.size_hint_y = hint
         
         
         self.serial_ports = self.get_serial_ports()
         self.serial_port_spinner = Spinner(
             text='Select Serial Port',
             values=self.serial_ports,
-            size_hint_y=None,
-            height=40
+            size_hint_y=1,
         )
         
         self.serial_port_spinner.bind(on_touch_down=self.update_serial_ports)
         
         # Connection Area        
-        self.baud_rate = TextInput(hint_text='Enter Baud Rate (e.g., 9600)', size_hint_y=None, height=40)
-        self.connect_button = Button(text='Connect', size_hint_y=None, height=40)
+        self.baud_rate = TextInput(hint_text='Enter Baud Rate (e.g., 9600)', size_hint_y=1)
+        self.connect_button = Button(text='Connect', size_hint_y=1)
         self.connect_button.bind(on_press=self.toggle_connection)
-        self.output_label = Label(size_hint_y=None, height=40)
+        self.output_label = Label(size_hint_y=1)
         
-        self.button_layout = BoxLayout(size_hint_y=None, height=40)
+        self.button_layout = BoxLayout(size_hint_y=1)
         self.start_button = Button(text='Start')
         self.stop_button = Button(text='Stop')
         self.start_button.bind(on_press=self.send_start_command)

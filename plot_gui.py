@@ -1,5 +1,3 @@
-# serial_monitor.py
-
 import kivy
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
@@ -13,39 +11,18 @@ import numpy as np
 import serial
 import serial.tools.list_ports
 import threading
-from form_fields import FormFields
-from serial_monitor import SerialMonitor
-
-kivy.require('2.0.0')
+from kivy.uix.widget import Widget
 
 
-# Serial Monitor Class
-class Application(BoxLayout):
+class Plotter(BoxLayout):
 
-    # Init Function
-    def __init__(self, **kwargs):
-        super(Application, self).__init__(**kwargs)
+    def __init__(self, application_gui, hint: float, **kwargs):
+        super(Plotter, self).__init__(**kwargs)
         self.orientation = 'vertical'
+        self.size_hint_y = hint
         
-        # Init The Plots
         self.init_plots()
-
-        # List to keep track of ID TextInputs
-        self.id_inputs = []
-
-        # Add four sets of form fields
-        self.forms = FormFields(self, num_fields=4)
-        self.add_widget(self.forms)
         
-        self.control = SerialMonitor(self)
-        self.add_widget(self.control)
-
-    # Unused but keep if there needs to be things that are destryed
-    def close_application(self):
-        if self.control.get_is_serial_connection() and self.control.get_is_serial_connection_open:
-            self.control.disconnect_from_serial()
-        
-
     def init_plots(self):
         self.data = {'C1': [0] * 100, 'C2': [0] * 100, 'C3': [0] * 100, 'C4': [0] * 100}
         self.fig, (self.ax1, self.ax2, self.ax3, self.ax4) = plt.subplots(4, 1, figsize=(10, 8))

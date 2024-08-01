@@ -3,9 +3,10 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.spinner import Spinner
 from kivy.uix.textinput import TextInput
+from kivy.uix.widget import Widget
 #from custom_text_input import ClearTextInput
 
-kivy.require('2.0.0')
+kivy.require('2.3.0')
 
 class ClearTextInput(TextInput):
     def on_focus(self, instance, value):
@@ -17,32 +18,34 @@ class ClearTextInput(TextInput):
 # TODO: Add Notion Integration, Add input Validation, Add getters and Setters
 class FormFields(BoxLayout):
 
-    def __init__(self, application_gui, num_fields: int, **kwargs):
+    def __init__(self, application_gui, num_fields: int, hint: float, **kwargs):
         super(FormFields, self).__init__(**kwargs)
+        #self.size = (1000, 1000)
         self.orientation = 'vertical'
-        self.size_hint_y = None
-        self.height = 160  # Adjust height based on the number of form fields
+        self.size_hint_y = hint
+        self.temp_y = 1 / num_fields
 
         self.id_inputs = []
+        self.num_fields = num_fields
 
-        for _ in range(num_fields + 1):
+        for _ in range(num_fields):
             self.__add_form_fields(application_gui)
             
     # Create and bind the form Fields so that they show up on the screen
     # TODO: Create events to handel state
     def __add_form_fields(self, application_gui):
-            form_layout = BoxLayout(size_hint_y=None, height=40)
-            id_input = ClearTextInput(hint_text='ID', size_hint_y=None, height=40, multiline=False)
+            form_layout = BoxLayout(size_hint_y=self.temp_y, size_hint_x=1)
+            form_layout.orientation = 'horizontal'
+            id_input = ClearTextInput(hint_text='ID', size_hint_y=1, multiline=False)
             id_input.bind(on_text_validate=self.on_enter)
             id_input.bind(on_focus=self.__on_focus)  # Bind the on_focus event
             self.id_inputs.append(id_input)
             pass_fail_spinner = Spinner(
                 text='Pass',
                 values=['Pass', 'Fail'],
-                size_hint_y=None,
-                height=40
+                size_hint_y=1
             )
-            enter_button = Button(text='Enter', size_hint_y=None, height=40)
+            enter_button = Button(text='Enter', size_hint_y=1)
             enter_button.bind(on_press=lambda instance, id_input=id_input, pass_fail_spinner=pass_fail_spinner: self.__submit_form(instance, id_input, pass_fail_spinner))
             form_layout.add_widget(id_input)
             form_layout.add_widget(pass_fail_spinner)
