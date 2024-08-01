@@ -17,7 +17,7 @@ class ClearTextInput(TextInput):
 # TODO: Add Notion Integration, Add input Validation, Add getters and Setters
 class FormFields(BoxLayout):
 
-    def __init__(self, serial_monitor, num_fields: int, **kwargs):
+    def __init__(self, application_gui, num_fields: int, **kwargs):
         super(FormFields, self).__init__(**kwargs)
         self.orientation = 'vertical'
         self.size_hint_y = None
@@ -25,16 +25,16 @@ class FormFields(BoxLayout):
 
         self.id_inputs = []
 
-        for _ in range(num_fields):
-            self.add_form_fields(serial_monitor)
+        for _ in range(num_fields + 1):
+            self.__add_form_fields(application_gui)
             
     # Create and bind the form Fields so that they show up on the screen
     # TODO: Create events to handel state
-    def add_form_fields(self, serial_monitor):
+    def __add_form_fields(self, application_gui):
             form_layout = BoxLayout(size_hint_y=None, height=40)
             id_input = ClearTextInput(hint_text='ID', size_hint_y=None, height=40, multiline=False)
             id_input.bind(on_text_validate=self.on_enter)
-            id_input.bind(on_focus=self.on_focus)  # Bind the on_focus event
+            id_input.bind(on_focus=self.__on_focus)  # Bind the on_focus event
             self.id_inputs.append(id_input)
             pass_fail_spinner = Spinner(
                 text='Pass',
@@ -43,7 +43,7 @@ class FormFields(BoxLayout):
                 height=40
             )
             enter_button = Button(text='Enter', size_hint_y=None, height=40)
-            enter_button.bind(on_press=lambda instance, id_input=id_input, pass_fail_spinner=pass_fail_spinner: self.submit_form(instance, id_input, pass_fail_spinner))
+            enter_button.bind(on_press=lambda instance, id_input=id_input, pass_fail_spinner=pass_fail_spinner: self.__submit_form(instance, id_input, pass_fail_spinner))
             form_layout.add_widget(id_input)
             form_layout.add_widget(pass_fail_spinner)
             form_layout.add_widget(enter_button)
@@ -55,17 +55,15 @@ class FormFields(BoxLayout):
         current_index = self.id_inputs.index(instance)
         if current_index + 1 < len(self.id_inputs):
             self.id_inputs[current_index + 1].focus = True
-        # elif current_index + 1 >= len(self.id_inputs):
-        #     self.id_inputs[0].focus = True
 
     # When the text area is focused, Deleted all text in it
-    def on_focus(self, instance, value):
+    def __on_focus(self, instance, value):
         if value:  # If the TextInput is focused
             instance.text = ''
 
     # A function handeling form submissions
     # TODO: Add notion integration
-    def submit_form(self, instance, id_input, pass_fail_spinner):
+    def __submit_form(self, instance, id_input, pass_fail_spinner):
         id_value = id_input.text
         pass_fail_value = pass_fail_spinner.text
         #self.update_output_label(f'ID: {id_value}, Status: {pass_fail_value}')
