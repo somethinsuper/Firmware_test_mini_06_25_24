@@ -12,10 +12,11 @@ from kivy.uix.relativelayout import RelativeLayout
 kivy.require('2.3.0')
 
 class SerialMonitorApp(App):
+    
     def build(self):
+        # Create a simple Box Layout
         layout = BoxLayout()
         layout.orientation = 'vertical'
-        #layout.size_hint(1,1)
         
         # Init The Plots
         self.plots = Plotter(self, hint=0.5)
@@ -25,8 +26,12 @@ class SerialMonitorApp(App):
         self.forms = FormFields(self, num_fields=4, hint=0.3)
         layout.add_widget(self.forms)
         
+        # Create Serial Control GUI
         self.control = SerialMonitor(self, hint=0.3)
         layout.add_widget(self.control)
+        
+        # Allow control GUI to send events to Plots
+        self.control.add_observer(self.plots)
 
         return layout
 
