@@ -325,6 +325,9 @@ void getChannelVoltage(int currentTest)
     delay(1);
   }
   
+  // Tell the Script there is a new Line
+  Serial.print("B1:1,");
+
   // Take all of the volatages generated from the device and print out the average to the serial Monitor
   for (int x = 0; x < NUMCHANNELS; x++)
   {
@@ -332,25 +335,30 @@ void getChannelVoltage(int currentTest)
     output[x] = output[x] / float(NUMSAMPLES);
     if (output[x] >= correct_low_value[currentTest] && output[x] <= correct_high_value[currentTest]){
       Serial.print(numToString[x]);
-      Serial.print("0");
+      Serial.print(output[x]);
+      //Serial.print("0");
     }
     else {
       Serial.print(numToString[x]);
-      Serial.print("1");
+      Serial.print(output[x]);
+      //Serial.print("1");
       //Serial.print(",");
       channelFails[x] += 1;
     }
 
-    if (x != NUMCHANNELS - 1){
-      Serial.print(",");
+    Serial.print(",");
+    // if (x != NUMCHANNELS - 1){
+    //   Serial.print(",");
 
-    }
+    // }
     // Serial.print(numToString[x]);
     // Serial.print(output[x]);
     // Serial.print(" ");
     // Serial.print(percentDiff(output[x], midpoint[currentTest]));
   }
 
+  // Tell the script that the line is Over
+  Serial.print("B1:0");
   Serial.println("");
 
 
@@ -485,6 +493,7 @@ void loop()
   // If the Go button gets pressed and the stop button is not pressed the go through all the tests
   if ((startTest && !StopButton.isPressed()))
   {
+    Serial.println("A1:1");
     for (int t = 0; t < NUMTESTS; t++)
     {
       nextTest(t);
