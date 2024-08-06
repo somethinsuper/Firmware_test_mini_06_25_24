@@ -501,6 +501,7 @@ void loop()
       // getChannelVoltage(t);
       // getChannelVoltage(t);
     }
+    Serial.println("A1:0");
 
     // Reset Samples
     for (int x = 0; x < NUMCHANNELS; x++){

@@ -3,6 +3,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy_garden.matplotlib import FigureCanvasKivyAgg
 import matplotlib.pyplot as plt
 from kivy.properties import StringProperty
+from cvs_utils import append_to_csv
 import numpy as np
 
 #TODO: Make into its own File / Utils
@@ -11,6 +12,8 @@ class MyList(list):
         return len(self)-1
 # Class creates graph and updates it on the screen 
 class Plotter(BoxLayout):
+    channel_barcode = ['', '', '', '']
+    file_array = ['ch1.csv', 'ch2.csv', 'ch3.csv', 'ch4.csv']
     
     # Event Handler that on changeupdates graph
     pair = StringProperty('')
@@ -58,8 +61,7 @@ class Plotter(BoxLayout):
         # Get the new key value pair and add it to existing Dict
         key, value = self.pair.split(':')
         temp_ch: int = self.data.get(key)
-        print(temp_ch)
-        print(value)
+#
         value = float(value)
         
         #print(value)
@@ -69,16 +71,21 @@ class Plotter(BoxLayout):
             self.delete_graph()
             #self.current_index
         # Command to Tell python when a new value is added
+        elif(key == 'A1' and value == 0):
+            #arr.tofile('data2.csv', sep = ',')
+            for i in range(0, 4):
+                print(self.channel_barcode[i])
+                append_to_csv(self.file_array[i], self.plot_x[i, :], self.channel_barcode[i], ("T" + str(i)))
         elif (key == 'B1' and value == 1):
             self.ax.clear()
         elif (key == 'B1' and value == 0):
             if (self.first):
                 self.plot_x = self.temp_array
                 self.first = False
-                print(self.plot_x)
+                #print(self.plot_x)
             else:
                 self.plot_x = np.hstack((self.plot_x, self.temp_array))
-                print(self.plot_x)
+                #print(self.plot_x)
             self.__redraw()
         elif(temp_ch != None):
             self.temp_array[temp_ch, 0] = value
@@ -94,26 +101,6 @@ class Plotter(BoxLayout):
         
     # Function to redraw the default graph and reduce Boilerplate
     def __redraw(self):
-        
-        
-        # self.ax.plot(input.get(channel), label ="Ch 1")
-        # self.ax.plot(input.get("C2"), label ="Ch 2")
-        # self.ax.plot(input.get("C3"), label ="Ch 3")
-        # self.ax.plot(input.get("C4"), label ="Ch 4")
-        
-        # Set graph type
-        # for channel in input:
-        #     #print(channel)
-        #     # Create different Color Graphs for each input
-        # match channel:
-        #     case 'C1':
-        #         self.ax.plot(self.plot_x[0], label ="Ch 1")
-        #     case 'C2':
-        #         self.ax.plot(self.plot_x[1], label ="Ch 2")
-        #     case 'C3':
-        #         self.ax.plot(self.plot_x[2], label ="Ch 3")
-        #     case 'C4':
-        #         self.ax.plot(self.plot_x[3], label ="Ch 4")
         self.ax.plot(self.plot_x[0, :], label ="Ch 1")
         self.ax.plot(self.plot_x[1, :], label ="Ch 2")
         self.ax.plot(self.plot_x[2, :], label ="Ch 3")
@@ -139,6 +126,10 @@ class Plotter(BoxLayout):
         self.first = True
         self.new_canvas.draw()
         
+        
+    def update_barcode(self, channel: int, value: str):
+        #print(value)
+        self.channel_barcode[channel] = value
         
     # Returns a tuple from dict
     def __parse_dict(self, input: dict[str : list[float]]):

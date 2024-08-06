@@ -4,6 +4,7 @@ from kivy.uix.button import Button
 from kivy.uix.spinner import Spinner
 from kivy.uix.textinput import TextInput
 from kivy.uix.widget import Widget
+from plot_gui import Plotter
 
 kivy.require('2.3.0')
 
@@ -17,6 +18,7 @@ class ClearTextInput(TextInput):
 # File that Deals with Form handling and Uploads
 # TODO: Add Notion Integration, Add input Validation, Add getters and Setters
 class FormFields(BoxLayout):
+    observers: list[Plotter] = []
 
     # Init class; setup sizing and create fields
     def __init__(self, application_gui, num_fields: int, hint: float, **kwargs):
@@ -48,6 +50,7 @@ class FormFields(BoxLayout):
         # Create new Id input and add it to list of inputs
         id_input = ClearTextInput(hint_text='ID', size_hint_y=1, multiline=False)
         id_input.bind(on_text_validate=self.on_enter)
+        id_input.bind(text=self.on_text_change)
         self.id_inputs.append(id_input)
         
         # Create Spinner object
@@ -71,6 +74,7 @@ class FormFields(BoxLayout):
         
         # Move focus to the next ID field only if there is another input
         current_index = self.id_inputs.index(instance)
+        
         if current_index + 1 < len(self.id_inputs):
             self.id_inputs[current_index + 1].focus = True
 
@@ -80,3 +84,17 @@ class FormFields(BoxLayout):
         id_value = id_input.text
         pass_fail_value = pass_fail_spinner.text
         #self.update_output_label(f'ID: {id_value}, Status: {pass_fail_value}')
+        
+    def on_text_change(self, instance, value):
+        current_index = self.id_inputs.index(instance)
+        #print(value)
+        #self.update_observer(current_index, value)
+        self.observers[0].update_barcode(current_index, value)
+        
+        
+    def add_observer(self, observer: Plotter):
+        self.observers.append(observer)
+        
+    def update_observer(self, id: int, value: str):
+        for observer in self.observers:
+            observer.update_barcode(id, value)

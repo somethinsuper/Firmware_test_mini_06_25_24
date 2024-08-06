@@ -30,10 +30,13 @@ class SerialMonitorApp(App):
         self.control = SerialMonitor(self, hint=0.3)
         layout.add_widget(self.control)
         
+        self.forms.add_observer(self.plots)
+        
         # Allow control GUI to send events to Plots
         self.control.add_observer(self.plots)
 
         return layout
+    
 
     def on_stop(self):
         # Ensure the serial connection is closed when the app exits
