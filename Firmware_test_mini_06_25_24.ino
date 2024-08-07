@@ -43,7 +43,7 @@
 // Latch Pin and Num Channels Gobal Varibles
 #define LATCH 2
 #define NUMCHANNELS 4
-#define NUMTESTS 8
+#define NUMTESTS 72
 #define NUMSAMPLES 100
 
 // An array that is filled with the number value of LEDS
@@ -51,9 +51,9 @@ const int redLeds[NUMCHANNELS] = {M1_RED_LED, M2_RED_LED, M3_RED_LED, M4_RED_LED
 const int greenLeds[NUMCHANNELS] = {M1_GREEN_LED, M2_GREEN_LED, M3_GREEN_LED, M4_GREEN_LED};
 
 // Resistance step values for the digital pot - 250,231,228,225,222,216,212,208.  Increases HV voltage in 25V increments up to 200V
-const byte AD5242_Res_Set[NUMTESTS] = {250, 231, 228, 225, 222, 216, 212, 208};
-const float correct_high_value[NUMTESTS] = {4.95, 4.90, 4.80, 2.85, 2.50, 1.70, 1.45, 1.1}; // the upper threshold values for verification of the device
-const float correct_low_value[NUMTESTS] = {3.90, 2.00, 1.80, 1.30, 1.15, 0.70, 0.55, 0.45}; // the lower threshold values for verification of the device
+// const byte AD5242_Res_Set[NUMTESTS] = {250, 231, 228, 225, 222, 216, 212, 208};
+// const float correct_high_value[NUMTESTS] = {4.95, 4.90, 4.80, 2.85, 2.50, 1.70, 1.45, 1.1}; // the upper threshold values for verification of the device
+// const float correct_low_value[NUMTESTS] = {3.90, 2.00, 1.80, 1.30, 1.15, 0.70, 0.55, 0.45}; // the lower threshold values for verification of the device
 float midpoint[NUMTESTS];
 
 // store the binary values read from the LTC2990
@@ -65,9 +65,8 @@ float module_optical_voltage_numeric[NUMCHANNELS][NUMTESTS];
 float module_EL_Voltage_numeric[NUMCHANNELS][NUMTESTS];
 
 // Array to get channel and test number from the serial Out.
-// TODO: Delete and come up with a simpler way
 const String numToString[NUMCHANNELS] = {"C1:", "C2:", "C3:", "C4:"};
-const String testToString[NUMTESTS] = {"S", "T", "U", "V", "W", "X", "Y", "Z"};
+//const String testToString[NUMTESTS] = {"S", "T", "U", "V", "W", "X", "Y", "Z"};
 unsigned int channelFails[NUMCHANNELS] = {0, 0, 0, 0};
 
 // Create button debounce object.
@@ -77,7 +76,7 @@ Bounce2::Button StopButton = Bounce2::Button();
 // Varibles for flashing LED logic.
 unsigned long previousMillis;
 int isFlashing = LOW;
-const int interval = 1000;
+const int interval = 1;
 
 unsigned int numFailed = 0;
 
@@ -333,18 +332,20 @@ void getChannelVoltage(int currentTest)
   {
     // Get the Average
     output[x] = output[x] / float(NUMSAMPLES);
-    if (output[x] >= correct_low_value[currentTest] && output[x] <= correct_high_value[currentTest]){
-      Serial.print(numToString[x]);
-      Serial.print(output[x]);
-      //Serial.print("0");
-    }
-    else {
-      Serial.print(numToString[x]);
-      Serial.print(output[x]);
-      //Serial.print("1");
-      //Serial.print(",");
-      channelFails[x] += 1;
-    }
+    Serial.print(numToString[x]);
+    Serial.print(output[x]);
+    // if (output[x] >= correct_low_value[currentTest] && output[x] <= correct_high_value[currentTest]){
+    //   Serial.print(numToString[x]);
+    //   Serial.print(output[x]);
+    //   //Serial.print("0");
+    // }
+    // else {
+    //   Serial.print(numToString[x]);
+    //   Serial.print(output[x]);
+    //   //Serial.print("1");
+    //   //Serial.print(",");
+    //   channelFails[x] += 1;
+    // }
 
     Serial.print(",");
     // if (x != NUMCHANNELS - 1){
@@ -372,14 +373,14 @@ void nextTest(int currentTest)
   isSlew = true;
 
   setLeds(HIGH, HIGH);
-  setGlobalResistance(AD5242_Res_Set[currentTest] - 30);
-  delay(1000);
-  setLeds(HIGH, LOW);
-  setGlobalResistance(AD5242_Res_Set[currentTest] - 10);
-  delay(1000);
+  // setGlobalResistance(220 - currentTest);
+  // delay(interval);
+  // setLeds(HIGH, LOW);
+  // setGlobalResistance(240 - currentTest);
+  delay(interval);
   setLeds(LOW, HIGH);
-  setGlobalResistance(AD5242_Res_Set[currentTest]);
-  delay(5000);
+  setGlobalResistance(250 - currentTest);
+  //delay(interval);
   setLeds(LOW, LOW);
   isSlew = false;
   isActive = true;
@@ -416,10 +417,10 @@ void setup()
   StopButton.interval(50);
 
   // Calculates the Midpoint between the low and high values. Could be done at compile time.
-  for (int i = 0; i < NUMTESTS; i++)
-  {
-    midpoint[i] = (correct_high_value[i] + correct_low_value[i]) / 2.0f;
-  }
+  // for (int i = 0; i < NUMTESTS; i++)
+  // {
+  //   midpoint[i] = (correct_high_value[i] + correct_low_value[i]) / 2.0f;
+  // }
 
   // Start
   Wire.begin();

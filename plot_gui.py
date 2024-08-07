@@ -13,7 +13,8 @@ class MyList(list):
 # Class creates graph and updates it on the screen 
 class Plotter(BoxLayout):
     channel_barcode = ['', '', '', '']
-    file_array = ['ch1.csv', 'ch2.csv', 'ch3.csv', 'ch4.csv']
+    #file_array = ['ch1.csv', 'ch2.csv', 'ch3.csv', 'ch4.csv']
+    file_array = ['ref.csv']
     
     # Event Handler that on changeupdates graph
     pair = StringProperty('')
@@ -42,7 +43,6 @@ class Plotter(BoxLayout):
         
         # Create fig
         fig, self.ax = plt.subplots()
-        
         
         # Create Canvas and add it to the GUI
         self.new_canvas = FigureCanvasKivyAgg(figure=fig)
@@ -75,7 +75,7 @@ class Plotter(BoxLayout):
             #arr.tofile('data2.csv', sep = ',')
             for i in range(0, 4):
                 print(self.channel_barcode[i])
-                append_to_csv(self.file_array[i], self.plot_x[i, :], self.channel_barcode[i], ("T" + str(i)))
+                append_to_csv(self.file_array[0], self.plot_x[i, :], self.channel_barcode[i], ("T" + str(i)))
         elif (key == 'B1' and value == 1):
             self.ax.clear()
         elif (key == 'B1' and value == 0):
